@@ -23,16 +23,12 @@ var Main = /** @class */ (function () {
                 nodeIntegrationInWorker: true,
                 backgroundThrottling: false,
                 enableRemoteModule: true,
-                webviewTag: true
             },
             width: 800, height: 600,
             minWidth: 800,
             minHeight: 600,
-            icon: __dirname + '/resources/osborn.png',
-            fullscreenable: true,
-            title: "Prime Link"
+            title: "Automatas"
         });
-        Main.mainWindow.maximize();
         Main.mainWindow.loadFile(htmlPath);
         Main.mainWindow.setMenuBarVisibility(true);
         Main.mainWindow.on('closed', Main.onClose);
