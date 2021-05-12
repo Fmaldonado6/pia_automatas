@@ -41,9 +41,9 @@ class Main {
         Main.application.on('window-all-closed', Main.onWindowAllClosed)
         Main.application.on('ready', Main.onReady)
     }
+    
 
 }
 
 if (app)
     Main.main(app)
-
