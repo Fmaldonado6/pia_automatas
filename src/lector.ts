@@ -42,7 +42,7 @@ function onLoad() {
 function validar() {
 
   try {
-    const lineas = result.split("\n").filter(x => x.length != 0)
+    const lineas = result.split("\n")
 
     for (let i = 0; i < lineas.length; i++) {
       const current = lineas[i]
@@ -50,7 +50,7 @@ function validar() {
         case lineas.length - 1: validateTerminar(current); break;
         case 1: validateInicio(current); break;
         case 0: validateStart(current); break;
-        default:
+        default: validateInstruction(current); break;
       }
 
     }
@@ -63,6 +63,10 @@ function validar() {
 
 }
 
+function validateInstruction(linea: string) {
+  const instructions = linea.split(";").filter(x => x != "\r").map(x => x + ";")
+  console.log(instructions)
+}
 
 function validateStart(linea: string) {
   const regex = new RegExp(/^programa .*;[ \t\n\r]*$/g)

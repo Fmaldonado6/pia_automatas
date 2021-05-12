@@ -28,7 +28,7 @@ function onLoad() {
 }
 function validar() {
     try {
-        var lineas = result.split("\n").filter(function (x) { return x.length != 0; });
+        var lineas = result.split("\n");
         for (var i = 0; i < lineas.length; i++) {
             var current = lineas[i];
             switch (i) {
@@ -42,6 +42,8 @@ function validar() {
                     validateStart(current);
                     break;
                 default:
+                    validateInstruction(current);
+                    break;
             }
         }
         M.toast({ html: 'Archivo valido' });
@@ -49,6 +51,10 @@ function validar() {
     catch (error) {
         M.toast({ html: 'Syntax error!' });
     }
+}
+function validateInstruction(linea) {
+    var instructions = linea.split(";").filter(function (x) { return x != "\r"; }).map(function (x) { return x + ";"; });
+    console.log(instructions);
 }
 function validateStart(linea) {
     var regex = new RegExp(/^programa .*;[ \t\n\r]*$/g);
