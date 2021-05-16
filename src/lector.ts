@@ -69,7 +69,7 @@ function validateInstruction(linea: string) {
 }
 
 function validateStart(linea: string) {
-  const regex = new RegExp(/^programa .*;[ \t\n\r]*$/g)
+  const regex = new RegExp(/^programa ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
   if (regex.test(linea))
     return true
   throw new Error("Syntax error")
@@ -81,6 +81,18 @@ function validateInicio(linea: string) {
     return true
   throw new Error("Syntax error")
 }
+
+function validateLeer(linea: string){
+  const regex = new RegExp(/^leer ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
+  if (regex.test(linea))
+    return true
+  throw new Error("Syntax error")
+}
+
+// function validateExpresion(linea: string){
+//   const regex = new RegExp(/^([a-z])([0-9a-z]*) := ([(]?([0-9]*|[a-z]*)[+|-|\/|*|^]([0-9]*|[a-z]*)[)]?)*;$/g);
+//   const regex1 = new RegExp(/^([a-z])([0-9a-z]*) := [(]?([(]?([-]?[0-9]+|([a-z])([0-9a-z]*)+)[)]?[+|-|\/|*|^][(]?([-]?[0-9]*|([a-z])([0-9a-z]*))[)]*)+;$/g);
+// }
 
 function validateTerminar(linea: string) {
   const regex = new RegExp(/^terminar.[ \t\n\r]*$/g)

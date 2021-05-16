@@ -57,7 +57,7 @@ function validateInstruction(linea) {
     console.log(instructions);
 }
 function validateStart(linea) {
-    var regex = new RegExp(/^programa .*;[ \t\n\r]*$/g);
+    var regex = new RegExp(/^programa ([a-z])([0-9a-z]*);[ \t\n\r]$/g);
     if (regex.test(linea))
         return true;
     throw new Error("Syntax error");
