@@ -130,7 +130,6 @@ function validateInicio(linea: string) {
 function validateLeer(linea: string) {
 
   const regex = new RegExp(/^leer[ \t\n\r]*([a-z])([0-9a-z]*)[ \t\n\r]*(;[ \t\n\r]*)$/)
-  console.log(linea)
   if (!regex.test(linea))
     throw new Error("Error de sintaxis")
 
@@ -240,7 +239,7 @@ function validateExpresionItem(item: string, currentChar: string, lastChar: stri
 
   if (operators.test(currentChar)) {
 
-    if (lastChar == "(")
+    if (lastChar == "(" || operators.test(lastChar))
       throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
 
     if (isVariable && !variables.has(item))
