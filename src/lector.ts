@@ -23,14 +23,15 @@ function onChange(event: any) {
 
   const extension = file.name.split(".").pop()
 
+  input.value = ""
+
   if (extension != "txt")
-    return M.toast({ html: `Por favor ingrese un archivo txt`, classes: "toast error-toast" });
+    return M.toast({ html: `Por favor ingrese un archivo txt`, classes: "toast error-toast", displayLength: 2000 });
 
   reader.readAsText(file);
 
   reader.onload = onLoad;
 
-  input.value = ""
 
 }
 
@@ -75,11 +76,11 @@ function validar() {
       }
 
     }
-    M.toast({ html: 'Archivo válido', classes: "toast success-toast" });
+    M.toast({ html: 'Archivo válido', classes: "toast success-toast", displayLength: 2000 });
 
   } catch (error) {
     console.error(error)
-    M.toast({ html: `${error} en línea ${i + 1}`, classes: "toast error-toast" });
+    M.toast({ html: `${error} en línea ${i + 1}`, classes: "toast error-toast", displayLength: 2000 });
 
   }
 
