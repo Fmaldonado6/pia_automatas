@@ -47,7 +47,7 @@ function validar() {
   try {
     const lineas = result.split("\n")
 
-    for (i = 0; i < lineas.length; i++) {
+    for (i; i < lineas.length; i++) {
       const current = lineas[i]
       switch (i) {
         case lineas.length - 1: validateTerminar(current); break;
@@ -72,11 +72,10 @@ function validateInstruction(linea: string) {
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
 
-    console.log(firstWord)
     switch (firstWord) {
       case "leer": validateLeer(instruction); break;
       case "imprimir": validateImprimir(instruction); break;
-      default: validateExpresion(instruction); break;
+      default: validateExpresionSyntax(instruction); break;
     }
 
   }
@@ -142,19 +141,31 @@ function validateImprimir(linea: string) {
   throw new Error("Syntax error")
 }
 
-function validateExpresion(linea: string) {
+function validateExpresionSyntax(linea: string) {
   const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/g);
+
   if (!regex.test(linea))
     throw new Error("Syntax error")
 
   const expresion = linea.split("=").pop()
+
+  if (expresion == null)
+    throw new Error("Syntax error")
 
   const newVarName = linea.split(":").filter(x => x != " ").shift()
 
   if (newVarName == null)
     throw new Error("Syntax error")
 
-  const operators = ['*', '+', '-', '/']
+  validateExpresion(expresion)
+
+  variables.add(newVarName)
+
+}
+
+function validateExpresion(expresion: string) {
+
+  const operators = new RegExp(/\+|-|\*|\/|^/)
 
   const parenthresis = []
 
@@ -162,30 +173,26 @@ function validateExpresion(linea: string) {
 
   let variableName = ""
 
-  for (let x of expresion!!.split("")) {
-    if (x == " ")
-      continue;
+  for (let x of expresion.split("")) {
 
-    if (x == "0" && lastCharacter == "/")
-      throw new Error(`Division entre 0`)
-
-    if (operators.includes(x)) {
-
-      if (variables.has(variableName) == null)
-        throw new Error(`La variable '${variableName}' no esta definida al momenta de usarse`)
-
-      variableName = ""
-    }
-
-    if (x == "(")
-      parenthresis.push(x)
-
-    if (x == ")") {
-
-      if (parenthresis.length == 0)
-        throw new Error(`Error de sintaxis`)
-
-      parenthresis.pop()
+    switch (x) {
+      case " ": continue;
+      case "0":
+        if (lastCharacter == "/")
+          throw new Error(`Division entre 0`)
+        break;
+      case "(":
+        parenthresis.push(x);
+        break;
+      case ")":
+        if (parenthresis.length == 0)
+          throw new Error(`Error de sintaxis`)
+        parenthresis.pop()
+        break;
+      default:
+        if (operators.test(x) && variables.has(variableName))
+          variableName = ""
+        break;
     }
 
     variableName += x
@@ -196,14 +203,7 @@ function validateExpresion(linea: string) {
   if (parenthresis.length != 0)
     throw new Error(`Error de sintaxis`)
 
-  variables.add(newVarName)
-
 }
-
-// function validateExpresion(linea: string){
-//   const regex = new RegExp(/^([a-z])([0-9a-z]*) := ([(]?([0-9]*|[a-z]*)[+|-|\/|*|^]([0-9]*|[a-z]*)[)]?)*;$/g);
-//   const regex1 = new RegExp(/^([a-z])([0-9a-z]*) := [(]?([(]?([-]?[0-9]+|([a-z])([0-9a-z]*)+)[)]?[+|-|\/|*|^][(]?([-]?[0-9]*|([a-z])([0-9a-z]*))[)]*)+;$/g);
-// }
 
 function validateTerminar(linea: string) {
   const regex = new RegExp(/^terminar.[ \t\n\r]*$/g)
