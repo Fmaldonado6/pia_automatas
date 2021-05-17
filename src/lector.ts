@@ -5,6 +5,8 @@ const validateButton = document.getElementById("validateButton")
 const reader = new FileReader();
 const variables = new Set<string>()
 const operators = new RegExp(/\+|-|\*|\/|\^|;/g)
+const whiteSpacesRegex = new RegExp(/^[\n\t \r]*$/g)
+
 const isVariableRegex = new RegExp(/^([a-z])([0-9a-z]*)$/g)
 const numberRegex = new RegExp(/^[0-9]*$/g)
 let result: string
@@ -49,6 +51,13 @@ function validar() {
 
     const value = editor.value
     const lineas = value.split("\n");
+
+
+    for (let j = lineas.length - 1; j > 0; j--) {
+      const linea = lineas[j]
+      if (linea.length == 0 || whiteSpacesRegex.test(linea))
+        lineas.pop()
+    }
 
     for (i; i < lineas.length; i++) {
       const current = lineas[i]
