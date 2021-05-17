@@ -165,7 +165,9 @@ function validateExpresionSyntax(linea: string) {
 
 function validateExpresion(expresion: string) {
 
-  const operators = new RegExp(/\+|-|\*|\/|^/)
+  const operators = new RegExp(/\+|-|\*|\/|\^/g)
+
+  const isVariable = new RegExp(/^([a-z])([0-9a-z]*)$/g)
 
   const parenthresis = []
 
@@ -174,7 +176,6 @@ function validateExpresion(expresion: string) {
   let variableName = ""
 
   for (let x of expresion.split("")) {
-
     switch (x) {
       case " ": continue;
       case "0":
@@ -190,13 +191,14 @@ function validateExpresion(expresion: string) {
         parenthresis.pop()
         break;
       default:
-        if (operators.test(x) && variables.has(variableName))
+        if (operators.test(x)) {
+          if (!variables.has(variableName) && isVariable.test(variableName))
+            throw new Error(`Variable '${variableName + x}' no definida al momento de utilizarse`)
           variableName = ""
+        } else
+          variableName += x
         break;
     }
-
-    variableName += x
-
     lastCharacter = x
   }
 
