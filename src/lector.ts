@@ -133,8 +133,9 @@ function validateImprimir(linea: string) {
   if (varName == null)
     throw new Error("Syntax error")
 
-  if (variables.has(varName) == null)
-    throw new Error("La variable no existe")
+
+  if (!variables.has(varName))
+    throw new Error(`La variable '${varName}' no esta definida al momento de utilizarse`)
 
   const regex = new RegExp(/^imprimir ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
 
@@ -175,7 +176,6 @@ function validateExpresion(expresion: string) {
   let variableName = ""
 
   for (let x of expresion.split("")) {
-    console.log(variableName, x)
     switch (x) {
       case " ": continue;
       case "0":
