@@ -4,11 +4,12 @@ const editor = document.getElementById("editor") as HTMLInputElement;
 const validateButton = document.getElementById("validateButton")
 const reader = new FileReader();
 const variables = new Set<string>()
-const operators = new RegExp(/\+|-|\*|\/|\^|;/g)
-const whiteSpacesRegex = new RegExp(/^[\n\t \r]*$/g)
+const operators = new RegExp(/\+|\-|\*|\/|\^|;/i)
+const whiteSpacesRegex = new RegExp(/^[\n\t \r]*$/i)
+const validCharacters = new RegExp(/^([a-z0-9; ()/\*\-\+\^\/\:\=\n\t\r\.])*$/i)
+const isVariableRegex = new RegExp(/^([a-z])([0-9a-z]*)$/i)
+const numberRegex = new RegExp(/^[0-9]*$/i)
 
-const isVariableRegex = new RegExp(/^([a-z])([0-9a-z]*)$/g)
-const numberRegex = new RegExp(/^[0-9]*$/g)
 let result: string
 
 if (input) input.addEventListener('change', onChange);
@@ -61,6 +62,10 @@ function validar() {
 
     for (i; i < lineas.length; i++) {
       const current = lineas[i]
+        console.log(validCharacters.test(current))
+      if (!validCharacters.test(current))
+        throw new Error(`Caracter inválido`)
+
       switch (i) {
         case lineas.length - 1: validateTerminar(current); break;
         case 1: validateInicio(current); break;
@@ -72,6 +77,7 @@ function validar() {
     M.toast({ html: 'Archivo válido', classes: "toast success-toast" });
 
   } catch (error) {
+    console.error(error)
     M.toast({ html: `${error} en línea ${i + 1}`, classes: "toast error-toast" });
 
   }
@@ -81,7 +87,7 @@ function validar() {
 function validateInstruction(linea: string) {
 
   const instructions = linea.split(";").filter(x => x != "\r"
-    && x != "\n"
+    && !whiteSpacesRegex.test(x)
     && x.length > 0).map(x => x + ";")
 
   if (instructions.length == 0)
@@ -89,6 +95,7 @@ function validateInstruction(linea: string) {
 
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
+    console.log(instructions)
     switch (firstWord) {
       case "leer": validateLeer(instruction); break;
       case "imprimir": validateImprimir(instruction); break;
@@ -100,14 +107,14 @@ function validateInstruction(linea: string) {
 }
 
 function validateStart(linea: string) {
-  const regex = new RegExp(/^programa ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
+  const regex = new RegExp(/^programa ([a-z])([0-9a-z]*);[ \t\n\r]*$/i)
   if (regex.test(linea))
     return true
   throw new Error("Syntax error")
 }
 
 function validateInicio(linea: string) {
-  const regex = new RegExp(/^iniciar[ \t\n\r]*$/g)
+  const regex = new RegExp(/^iniciar[ \t\n\r]*$/i)
   if (regex.test(linea))
     return true
   throw new Error("Syntax error")
@@ -115,24 +122,25 @@ function validateInicio(linea: string) {
 
 function validateLeer(linea: string) {
 
-  const lineaSplit = linea.split(" ")
+  const regex = new RegExp(/^leer ([a-z])([0-9a-z]*);[ \t\n\r]*$/i)
 
+  if (!regex.test(linea))
 
-  if (lineaSplit.length > 2)
     throw new Error("Syntax error")
 
-  const varName = lineaSplit.pop()?.split(";").shift()
 
+  const lineaSplit = linea.split("leer")
+
+  const varName = lineaSplit.pop()?.split(";").shift()
+  console.log(varName == null)
   if (varName == null)
     throw new Error("Syntax error")
 
-  const regex = new RegExp(/^leer ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
 
-  if (regex.test(linea)) {
-    variables.add(varName)
-    return true
-  }
-  throw new Error("Syntax error")
+  variables.add(varName.replace(/\s/i, ""))
+
+  return true
+
 }
 
 function validateImprimir(linea: string) {
@@ -144,7 +152,6 @@ function validateImprimir(linea: string) {
 
 
   const varName = lineaSplit.pop()?.split(";").shift()
-
   if (varName == null)
     throw new Error("Syntax error")
 
@@ -152,7 +159,7 @@ function validateImprimir(linea: string) {
   if (!variables.has(varName))
     throw new Error(`La variable '${varName}' no esta definida al momento de utilizarse`)
 
-  const regex = new RegExp(/^imprimir ([a-z])([0-9a-z]*);[ \t\n\r]*$/g)
+  const regex = new RegExp(/^imprimir ([a-z])([0-9a-z]*);[ \t\n\r]*$/i)
 
   if (regex.test(linea))
     return true
@@ -161,7 +168,10 @@ function validateImprimir(linea: string) {
 }
 
 function validateExpresionSyntax(linea: string) {
-  const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/g);
+
+  console.log(linea)
+
+  const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/i);
 
   if (!regex.test(linea))
     throw new Error("Syntax error")
@@ -171,6 +181,7 @@ function validateExpresionSyntax(linea: string) {
   if (expresion == null)
     throw new Error("Syntax error")
 
+
   const newVarName = linea.split(":").filter(x => x != " ").shift()
 
   if (newVarName == null)
@@ -178,7 +189,7 @@ function validateExpresionSyntax(linea: string) {
 
   validateExpresion(expresion)
 
-  variables.add(newVarName)
+  variables.add(newVarName.replace(/\s/g, ""))
 
 }
 
@@ -191,6 +202,7 @@ function validateExpresion(expresion: string) {
   let variableName = ""
 
   for (let x of expresion.split("")) {
+
     switch (x) {
       case " ": continue;
       case "0":
@@ -208,7 +220,7 @@ function validateExpresion(expresion: string) {
         parenthresis.pop()
         break;
       default:
-        if (validateExpresionItem(variableName, x))
+        if (validateExpresionItem(variableName, x, lastCharacter))
           variableName = ""
         else variableName += x
         break;
@@ -221,13 +233,15 @@ function validateExpresion(expresion: string) {
 
 }
 
-function validateExpresionItem(item: string, currentChar: string): boolean {
-
+function validateExpresionItem(item: string, currentChar: string, lastChar: string): boolean {
 
   const isVariable = isVariableRegex.test(item)
 
-
   if (operators.test(currentChar)) {
+
+    if (lastChar == "(")
+      throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
+
     if (isVariable && !variables.has(item))
       throw new Error(`La variable ${item} no esta definida al momento de utilizarse`)
     return true
@@ -235,6 +249,8 @@ function validateExpresionItem(item: string, currentChar: string): boolean {
 
   const number = Number.parseInt(item)
   const itemIsEmpty = item.split("").length == 0
+
+  console.log(isVariable, number, itemIsEmpty)
 
   if (!isVariable && Number.isNaN(number) && !itemIsEmpty) {
     throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
@@ -247,7 +263,7 @@ function validateExpresionItem(item: string, currentChar: string): boolean {
 }
 
 function validateTerminar(linea: string) {
-  const regex = new RegExp(/^terminar.[ \t\n\r]*$/g)
+  const regex = new RegExp(/^terminar.[ \t\n\r]*$/i)
   if (regex.test(linea))
     return true
   throw new Error("Syntax error")
