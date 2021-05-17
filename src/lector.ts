@@ -116,14 +116,14 @@ function validateStart(linea: string) {
   const regex = new RegExp(/^programa ([a-z])([0-9a-z]*);[ \t\n\r]*$/)
   if (regex.test(linea))
     return true
-  throw new Error("Syntax error")
+  throw new Error("Error de sintaxis")
 }
 
 function validateInicio(linea: string) {
   const regex = new RegExp(/^iniciar[ \t\n\r]*$/)
   if (regex.test(linea))
     return true
-  throw new Error("Syntax error")
+  throw new Error("Error de sintaxis")
 }
 
 function validateLeer(linea: string) {
@@ -131,17 +131,17 @@ function validateLeer(linea: string) {
   const regex = new RegExp(/^leer[ \t\n\r]*([a-z])([0-9a-z]*)[ \t\n\r]*(;[ \t\n\r]*)$/)
   console.log(linea)
   if (!regex.test(linea))
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
 
   const lineaSplit = linea.split("leer")
 
   const varName = lineaSplit.pop()?.split(";").shift()
   if (varName == null)
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
 
-  variables.add(varName.replace(/\s/, ""))
+  variables.add(varName.replace(/\s/g, ""))
 
   return true
 
@@ -152,17 +152,16 @@ function validateImprimir(linea: string) {
   const regex = new RegExp(/^imprimir[ \t\n\r]*([a-z])([0-9a-z]*)[ \t\n\r]*;[ \t\n\r]*$/)
 
   if (!regex.test(linea))
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
   const lineaSplit = linea.split("imprimir")
 
 
   const varName = lineaSplit.pop()?.split(";").shift()
-
   if (varName == null)
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
-  const realVarName = varName.replace(/\s/, "")
+  const realVarName = varName.replace(/\s/g, "")
 
   if (!variables.has(realVarName))
     throw new Error(`La variable ${realVarName} no esta definida al momento de utilizarse`)
@@ -175,18 +174,18 @@ function validateExpresionSyntax(linea: string) {
   const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/);
 
   if (!regex.test(linea))
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
   const expresion = linea.split("=").pop()
 
   if (expresion == null)
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
 
   const newVarName = linea.split(":").filter(x => x != " ").shift()
 
   if (newVarName == null)
-    throw new Error("Syntax error")
+    throw new Error("Error de sintaxis")
 
   validateExpresion(expresion)
 
@@ -266,5 +265,5 @@ function validateTerminar(linea: string) {
   const regex = new RegExp(/^terminar.[ \t\n\r]*$/)
   if (regex.test(linea))
     return true
-  throw new Error("Syntax error")
+  throw new Error("Error de sintaxis")
 }
