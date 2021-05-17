@@ -1,0 +1,77 @@
+html,
+body {
+  margin: 0px;
+  background-color: #252526;
+  color: white;
+}
+
+.toast {
+  border-radius: 25px;
+  font-weight: 400;
+}
+#fileInput {
+  display: none;
+}
+
+.btn {
+  border-radius: 20px;
+  margin-right: 10px;
+}
+
+.error-toast {
+  background-color: #ef5350;
+}
+
+.success-toast {
+  background-color: #66bb6a;
+}
+
+h3 {
+  font-size: 30px;
+}
+
+p {
+  margin-top: 20px;
+  margin-bottom: 0px;
+  color: rgb(202, 202, 202);
+}
+
+textarea {
+  border-radius: 10px;
+  margin: 20px 0px !important;
+  overflow-y: auto;
+  border: none;
+  height: 300px;
+  max-width: 100%;
+  min-width: 100%;
+  background-color: #1e1e1e;
+  counter-reset: line;
+  padding: 10px;
+  font-size: 16px;
+  outline: none;
+  line-height: 25px;
+  color: #aab2be;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+
+  background: #4e4e4e;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

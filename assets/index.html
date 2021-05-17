@@ -8,17 +8,28 @@
       rel="stylesheet"
       href="../node_modules/materialize-css/dist/css/materialize.min.css"
     />
+    <link rel="stylesheet" href="./css/index.css" />
     <title>Document</title>
   </head>
   <body>
     <div class="container">
-      <h1>Buenas Fer si jala</h1>
+      <h3>Validar Programa</h3>
+      <p>
+        Escriba un programa o cargue uno desde un archivo de texto para
+        validarlo.
+      </p>
       <input id="fileInput" type="file" />
-      <div id="text"></div>
-      <br>
-      <button class="btn" id="validateButton">Validar texto</button>
+
+      <textarea id="editor"></textarea>
+      <button class="btn indigo lighten-2" id="validateButton">
+        Validar texto
+      </button>
+      <label for="fileInput" class="btn indigo lighten-2">
+        Cargar archivo
+      </label>
     </div>
     <script src="../node_modules/materialize-css/dist/js/materialize.min.js"></script>
+    <script src="../build/editor.js"></script>
     <script src="../build/lector.js"></script>
   </body>
 </html>

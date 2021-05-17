@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && electron build/index.js"
+    "start": "tsc && electron build/index.js",
+    "build-w": "tsc -w"
   },
   "author": "",
   "license": "ISC",

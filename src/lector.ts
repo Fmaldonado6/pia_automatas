@@ -1,5 +1,6 @@
 
 const input = document.getElementById("fileInput") as HTMLInputElement;
+const editor = document.getElementById("editor") as HTMLInputElement;
 const validateButton = document.getElementById("validateButton")
 const reader = new FileReader();
 const variables = new Set<string>()
@@ -16,6 +17,11 @@ if (validateButton) validateButton.addEventListener('click', validar)
 function onChange(event: any) {
   let file = event.target.files[0];
 
+  const extension = file.name.split(".").pop()
+
+  if (extension != "txt")
+    return M.toast({ html: `Por favor ingrese un archivo txt`, classes: "toast error-toast" });
+
   reader.readAsText(file);
 
   reader.onload = onLoad;
@@ -30,25 +36,19 @@ function onLoad() {
   if (!reader.result)
     return
 
+
   result = reader.result as string
 
-  let lineas = result.split('\n');
-
-  let codigoHTML = "";
-
-  for (let linea of lineas) {
-    codigoHTML += '<p>' + linea + '</p>'
-  }
-
-  const element = document.getElementById("text")
-  if (element) element.innerHTML = codigoHTML;
+  editor.value = result
 
 }
 
 function validar() {
   let i = 0
   try {
-    const lineas = result.split("\n")
+
+    const value = editor.value
+    const lineas = value.split("\n");
 
     for (i; i < lineas.length; i++) {
       const current = lineas[i]
@@ -60,21 +60,26 @@ function validar() {
       }
 
     }
-    M.toast({ html: 'Archivo valido' });
+    M.toast({ html: 'Archivo válido', classes: "toast success-toast" });
 
   } catch (error) {
-    M.toast({ html: `${error} en línea ${i + 1}` });
+    M.toast({ html: `${error} en línea ${i + 1}`, classes: "toast error-toast" });
 
   }
 
 }
 
 function validateInstruction(linea: string) {
-  const instructions = linea.split(";").filter(x => x != "\r").map(x => x + ";")
+
+  const instructions = linea.split(";").filter(x => x != "\r"
+    && x != "\n"
+    && x.length > 0).map(x => x + ";")
+
+  if (instructions.length == 0)
+    throw new Error("Error de sintaxis")
 
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
-
     switch (firstWord) {
       case "leer": validateLeer(instruction); break;
       case "imprimir": validateImprimir(instruction); break;
@@ -102,6 +107,7 @@ function validateInicio(linea: string) {
 function validateLeer(linea: string) {
 
   const lineaSplit = linea.split(" ")
+
 
   if (lineaSplit.length > 2)
     throw new Error("Syntax error")
