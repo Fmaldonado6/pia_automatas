@@ -2,11 +2,12 @@
   "name": "automatas_pia",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && electron build/index.js",
-    "build-w": "tsc -w"
+    "build-w": "tsc -w",
+    "packager": "tsc && electron-packager . Automatas  --out=./out/ --ignore=^/src --overwrite "
   },
   "author": "",
   "license": "ISC",
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@types/electron": "^1.6.10",
     "@types/materialize-css": "^1.0.9",
+    "electron-packager": "^15.2.0",
     "typescript": "^4.2.4"
   }
 }

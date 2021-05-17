@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain, app } from 'electron'
+import { BrowserWindow, app } from 'electron'
 import path from 'path'
 class Main {
     static mainWindow: Electron.BrowserWindow | null
@@ -15,7 +15,7 @@ class Main {
     }
 
     static onReady() {
-        const htmlPath = path.join("..", "assets", "index.html")
+        const htmlPath = path.join(__dirname, "..", "assets", "index.html")
         Main.mainWindow = new Main.browserWindow({
             webPreferences: {
                 nodeIntegration: true,
