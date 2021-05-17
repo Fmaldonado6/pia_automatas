@@ -3,6 +3,9 @@ const input = document.getElementById("fileInput") as HTMLInputElement;
 const validateButton = document.getElementById("validateButton")
 const reader = new FileReader();
 const variables = new Set<string>()
+const operators = new RegExp(/\+|-|\*|\/|\^|;/g)
+const isVariableRegex = new RegExp(/^([a-z])([0-9a-z]*)$/g)
+const numberRegex = new RegExp(/^[0-9]*$/g)
 let result: string
 
 if (input) input.addEventListener('change', onChange);
@@ -165,17 +168,14 @@ function validateExpresionSyntax(linea: string) {
 
 function validateExpresion(expresion: string) {
 
-  const operators = new RegExp(/\+|-|\*|\/|\^/g)
-
-  const isVariable = new RegExp(/^([a-z])([0-9a-z]*)$/g)
-
   const parenthresis = []
 
-  let lastCharacter
+  let lastCharacter = ""
 
   let variableName = ""
 
   for (let x of expresion.split("")) {
+    console.log(variableName, x)
     switch (x) {
       case " ": continue;
       case "0":
@@ -186,17 +186,16 @@ function validateExpresion(expresion: string) {
         parenthresis.push(x);
         break;
       case ")":
-        if (parenthresis.length == 0)
-          throw new Error(`Error de sintaxis`)
+        if (parenthresis.length == 0
+          || lastCharacter == "("
+          || operators.test(lastCharacter))
+          throw new Error(`Error de sintaxis caracter ${x} inesperado`)
         parenthresis.pop()
         break;
       default:
-        if (operators.test(x)) {
-          if (!variables.has(variableName) && isVariable.test(variableName))
-            throw new Error(`Variable '${variableName + x}' no definida al momento de utilizarse`)
+        if (validateExpresionItem(variableName, x))
           variableName = ""
-        } else
-          variableName += x
+        else variableName += x
         break;
     }
     lastCharacter = x
@@ -204,6 +203,31 @@ function validateExpresion(expresion: string) {
 
   if (parenthresis.length != 0)
     throw new Error(`Error de sintaxis`)
+
+}
+
+function validateExpresionItem(item: string, currentChar: string): boolean {
+
+
+  const isVariable = isVariableRegex.test(item)
+
+
+  if (operators.test(currentChar)) {
+    if (isVariable && !variables.has(item))
+      throw new Error(`La variable ${item} no esta definida al momento de utilizarse`)
+    return true
+  }
+
+  const number = Number.parseInt(item)
+  const itemIsEmpty = item.split("").length == 0
+
+  if (!isVariable && Number.isNaN(number) && !itemIsEmpty) {
+    throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
+  }
+
+
+
+  return false
 
 }
 
