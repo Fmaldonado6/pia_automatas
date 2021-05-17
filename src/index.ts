@@ -29,7 +29,7 @@ class Main {
             title: "Automatas"
         });
         Main.mainWindow.loadFile(htmlPath)
-        Main.mainWindow.setMenuBarVisibility(true)
+        Main.mainWindow.setMenuBarVisibility(false)
         Main.mainWindow.on('closed', Main.onClose)
     }
     static main(application: Electron.App) {
