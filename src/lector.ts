@@ -62,7 +62,6 @@ function validar() {
 
     for (i; i < lineas.length; i++) {
       const current = lineas[i]
-        console.log(validCharacters.test(current))
       if (!validCharacters.test(current))
         throw new Error(`Caracter inválido`)
 
@@ -95,7 +94,6 @@ function validateInstruction(linea: string) {
 
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
-    console.log(instructions)
     switch (firstWord) {
       case "leer": validateLeer(instruction); break;
       case "imprimir": validateImprimir(instruction); break;
@@ -132,7 +130,6 @@ function validateLeer(linea: string) {
   const lineaSplit = linea.split("leer")
 
   const varName = lineaSplit.pop()?.split(";").shift()
-  console.log(varName == null)
   if (varName == null)
     throw new Error("Syntax error")
 
@@ -168,8 +165,6 @@ function validateImprimir(linea: string) {
 }
 
 function validateExpresionSyntax(linea: string) {
-
-  console.log(linea)
 
   const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/i);
 
@@ -250,7 +245,6 @@ function validateExpresionItem(item: string, currentChar: string, lastChar: stri
   const number = Number.parseInt(item)
   const itemIsEmpty = item.split("").length == 0
 
-  console.log(isVariable, number, itemIsEmpty)
 
   if (!isVariable && Number.isNaN(number) && !itemIsEmpty) {
     throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
