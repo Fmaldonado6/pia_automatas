@@ -4,7 +4,7 @@ const editor = document.getElementById("editor") as HTMLInputElement;
 const validateButton = document.getElementById("validateButton")
 const reader = new FileReader();
 const variables = new Set<string>()
-const operators = new RegExp(/\+|\-|\*|\/|\^|;/)
+const operators = new RegExp(/\+|\-|\*|\/|\^/)
 const whiteSpacesRegex = new RegExp(/^[\n\t \r]*$/)
 const validCharacters = new RegExp(/^([a-z0-9 ;()/\*\-\+\^\/\:\=\n\t\r\.])*$/)
 const isVariableRegex = new RegExp(/^([a-z])([0-9a-z]*)$/)
@@ -80,7 +80,7 @@ function validar() {
 
   } catch (error) {
     console.error(error)
-    M.toast({ html: `${error} en línea ${i + 1}`, classes: "toast error-toast", displayLength: 2000 });
+    M.toast({ html: `${error}, línea ${i + 1}`, classes: "toast error-toast", displayLength: 2000 });
 
   }
 
@@ -88,18 +88,22 @@ function validar() {
 
 function validateInstruction(linea: string) {
 
-  const validInstruction = new RegExp(/^([a-z0-9 ()/\*\-\+\^\/\:\=\n\t\r\.])*(;[\n\t \r]*)$/)
+  const validInstruction = new RegExp(/^(([a-z0-9 ()/\*\-\+\^\/\:\=\n\t\r\.])*(;[\n\t \r]*))*$/)
 
   if (!validInstruction.test(linea))
-    throw new Error("Error de sintaxis")
+    throw new Error("Instrucción mal construida")
 
   const instructions = linea.split(";").filter(x =>
     !whiteSpacesRegex.test(x)
-    && x.length > 0).map(x => x + ";")
+    && x.length > 0).map(x => {
 
+      x = x.replace(/^ */, "")
+
+      return x + ";"
+    })
 
   if (instructions.length == 0)
-    throw new Error("Error de sintaxis")
+    throw new Error("No puede haber líneas en blanco")
 
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
@@ -129,19 +133,31 @@ function validateInicio(linea: string) {
 
 function validateLeer(linea: string) {
 
-  const regex = new RegExp(/^leer[ \t\n\r]*([a-z])([0-9a-z]*)[ \t\n\r]*(;[ \t\n\r]*)$/)
+  const regex = new RegExp(/^leer .*;$/)
   if (!regex.test(linea))
-    throw new Error("Error de sintaxis")
+    throw new Error("Instrucción mal construida")
+
+  const regexCaracteresValidos = new RegExp(/^leer ([a-z])([0-9a-z]*)[ \t\n\r]*(;[ \t\n\r]*)$/)
+
+  if (!regexCaracteresValidos.test(linea))
+    throw new Error("Caractér inválido")
 
 
   const lineaSplit = linea.split("leer")
 
-  const varName = lineaSplit.pop()?.split(";").shift()
+  const varName = lineaSplit.pop()?.replace(";", "")
   if (varName == null)
     throw new Error("Error de sintaxis")
 
+  const realVarName = varName.replace(/\s/g, "")
+  const regexPalabrasReservadas = new RegExp(/^(leer|imprimir|programa|terminar|iniciar)$/)
+  if (regexPalabrasReservadas.test(realVarName))
+    throw new Error("Palabra reservada como nombre de variable")
 
-  variables.add(varName.replace(/\s/g, ""))
+  if (variables.has(realVarName))
+    throw new Error(`Variable '${varName}' ya está definida`)
+
+  variables.add(realVarName)
 
   return true
 
@@ -149,7 +165,7 @@ function validateLeer(linea: string) {
 
 function validateImprimir(linea: string) {
 
-  const regex = new RegExp(/^imprimir[ \t\n\r]*([a-z])([0-9a-z]*)[ \t\n\r]*;[ \t\n\r]*$/)
+  const regex = new RegExp(/^imprimir ([a-z])([0-9a-z]*)[ \t\n\r]*;[ \t\n\r]*$/)
 
   if (!regex.test(linea))
     throw new Error("Error de sintaxis")
@@ -174,9 +190,19 @@ function validateExpresionSyntax(linea: string) {
   const regex = new RegExp(/^([a-z])([0-9a-z]*)( )*:=.*;$/);
 
   if (!regex.test(linea))
-    throw new Error("Error de sintaxis")
+    throw new Error("Expresión mal construida")
 
-  const expresion = linea.split("=").pop()
+  const regexCaracteres = new RegExp(/^([a-z])([0-9a-z]*)( )?:=.([0-9a-z ()+\-\*\/\^]*);$/);
+
+
+  if (!regexCaracteres.test(linea))
+    throw new Error("Caractér inválido")
+
+  const splitLinea = linea.split("=")
+
+  splitLinea.shift()
+
+  const expresion = splitLinea.join("")
 
   if (expresion == null)
     throw new Error("Error de sintaxis")
@@ -203,6 +229,7 @@ function validateExpresion(expresion: string) {
 
   for (let x of expresion.split("")) {
 
+
     switch (x) {
       case " ": continue;
       case "0":
@@ -210,14 +237,19 @@ function validateExpresion(expresion: string) {
           throw new Error(`Division entre 0`)
         break;
       case "(":
+        if (!operators.test(lastCharacter) && variableName.length > 0)
+          throw new Error(`Caracter '${x}' inesperado`)
         parenthresis.push(x);
+        variableName = ""
         break;
       case ")":
         if (parenthresis.length == 0
           || lastCharacter == "("
           || operators.test(lastCharacter))
-          throw new Error(`Error de sintaxis caracter ${x} inesperado`)
+          throw new Error(`Caracter '${x}' inesperado`)
         parenthresis.pop()
+        variableName = ""
+
         break;
       default:
         if (validateExpresionItem(variableName, x, lastCharacter))
@@ -228,6 +260,7 @@ function validateExpresion(expresion: string) {
     lastCharacter = x
   }
 
+
   if (parenthresis.length != 0)
     throw new Error(`Error de sintaxis`)
 
@@ -235,12 +268,25 @@ function validateExpresion(expresion: string) {
 
 function validateExpresionItem(item: string, currentChar: string, lastChar: string): boolean {
 
+
+  if (item.split("").length == 0) {
+
+    if (operators.test(currentChar) && currentChar != "-")
+      throw new Error(`Caracter '${currentChar}' inesperado`)
+
+    item = currentChar
+  }
+
+
   const isVariable = isVariableRegex.test(item)
 
-  if (operators.test(currentChar)) {
+  if (operators.test(currentChar) || currentChar == ";") {
 
-    if (lastChar == "(" || operators.test(lastChar))
-      throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
+    if (operators.test(lastChar) && currentChar == "-" && lastChar != "-")
+      return true
+
+    if (lastChar == "(" && currentChar != "-" || operators.test(lastChar))
+      throw new Error(`Caracter '${currentChar}' inesperado`)
 
     if (isVariable && !variables.has(item))
       throw new Error(`La variable ${item} no esta definida al momento de utilizarse`)
@@ -248,13 +294,9 @@ function validateExpresionItem(item: string, currentChar: string, lastChar: stri
   }
 
   const number = Number.parseInt(item)
-  const itemIsEmpty = item.split("").length == 0
 
-
-  if (!isVariable && Number.isNaN(number) && !itemIsEmpty) {
-    throw new Error(`Error de sintaxis caracter ${currentChar} inesperado`)
-  }
-
+  if (!isVariable && Number.isNaN(number))
+    throw new Error(`Caracter '${currentChar}' inesperado`)
 
 
   return false
