@@ -154,9 +154,6 @@ function validateLeer(linea: string) {
   if (regexPalabrasReservadas.test(realVarName))
     throw new Error("Palabra reservada como nombre de variable")
 
-  if (variables.has(realVarName))
-    throw new Error(`Variable '${varName}' ya está definida`)
-
   variables.add(realVarName)
 
   return true

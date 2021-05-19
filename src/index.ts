@@ -26,7 +26,7 @@ class Main {
             width: 800, height: 600,
             minWidth: 800,
             minHeight: 600,
-            title: "Automatas"
+            title: "TA 032 PIA E6"
         });
         Main.mainWindow.loadFile(htmlPath)
         Main.mainWindow.setMenuBarVisibility(false)
