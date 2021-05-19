@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && electron build/index.js",
     "build-w": "tsc -w",
-    "packager": "tsc && electron-packager . TA 032 PIA E6  --out=./out/ --ignore=^/src --overwrite "
+    "packager": "tsc && electron-packager . 'TA 032 PIA E6'  --out=./out/ --ignore=^/src --overwrite "
   },
   "author": "",
   "license": "ISC",

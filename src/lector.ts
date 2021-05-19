@@ -63,6 +63,8 @@ function validar() {
         lineas.pop()
     }
 
+
+
     for (i; i < lineas.length; i++) {
       const current = lineas[i]
       if (!validCharacters.test(current))
@@ -76,6 +78,10 @@ function validar() {
       }
 
     }
+
+    if (lineas.length <= 3)
+      throw new Error("El programa debe tener al menos una instrucción")
+
     M.toast({ html: 'Archivo válido', classes: "toast success-toast", displayLength: 2000 });
 
   } catch (error) {
@@ -93,6 +99,11 @@ function validateInstruction(linea: string) {
   if (!validInstruction.test(linea))
     throw new Error("Instrucción mal construida")
 
+  const startsWithWhiteSpace = new RegExp(/^([ \n\t\r])/)
+
+  if (startsWithWhiteSpace.test(linea))
+    throw new Error("No puede haber espacios al inicio de la línea")
+
   const instructions = linea.split(";").filter(x =>
     !whiteSpacesRegex.test(x)
     && x.length > 0).map(x => {
@@ -104,6 +115,9 @@ function validateInstruction(linea: string) {
 
   if (instructions.length == 0)
     throw new Error("No puede haber líneas en blanco")
+
+  if (instructions.length > 1)
+    throw new Error("Una línea no puede tener más de una instrucción")
 
   for (let instruction of instructions) {
     const firstWord = instruction.split(" ").shift()
