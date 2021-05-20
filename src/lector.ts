@@ -167,7 +167,6 @@ function validateLeer(linea: string) {
   const regexPalabrasReservadas = new RegExp(/^(leer|imprimir|programa|terminar|iniciar)$/)
   if (regexPalabrasReservadas.test(realVarName))
     throw new Error("Palabra reservada como nombre de variable")
-
   variables.add(realVarName)
 
   return true
@@ -203,7 +202,7 @@ function validateExpresionSyntax(linea: string) {
   if (!regex.test(linea))
     throw new Error("Expresión mal construida")
 
-  const regexCaracteres = new RegExp(/^([a-z])([0-9a-z]*)( )?:=.([0-9a-z ()+\-\*\/\^]*);$/);
+  const regexCaracteres = new RegExp(/^([a-z])([0-9a-z]*)( )?:=([0-9a-z ()+\-\*\/\^]*);$/);
 
 
   if (!regexCaracteres.test(linea))
@@ -231,7 +230,6 @@ function validateExpresionSyntax(linea: string) {
 }
 
 function validateExpresion(expresion: string) {
-  const regexIsNumber = new RegExp(/[0-9]/)
   const parenthresis = []
 
   let lastCharacter = null
@@ -271,6 +269,11 @@ function validateExpresion(expresion: string) {
           || lastCharacter == "("
           || operators.test(lastCharacter!!))
           throw new Error(`Caracter '${x}' inesperado`)
+
+
+        if (isVariableRegex.test(variableName) && !variables.has(variableName))
+          throw new Error(`La variable ${variableName} no esta definida al momento de utilizarse`)
+
         parenthresis.pop()
         variableName = ""
 
@@ -280,7 +283,7 @@ function validateExpresion(expresion: string) {
         if (lastCharacter == "/" && x == "0")
           throw new Error(`Division entre 0`)
 
-    
+
 
         if (validateExpresionItem(variableName, x, lastCharacter!!))
           variableName = ""
@@ -298,6 +301,7 @@ function validateExpresion(expresion: string) {
 
 function validateExpresionItem(item: string, currentChar: string, lastChar: string): boolean {
 
+
   if (lastChar == ")" && !operators.test(currentChar) && currentChar != ";")
     throw new Error(`Caracter '${currentChar}' inesperado`)
 
@@ -311,7 +315,7 @@ function validateExpresionItem(item: string, currentChar: string, lastChar: stri
 
   const isVariable = isVariableRegex.test(item)
 
-  if (operators.test(currentChar) || currentChar == ";") {
+  if (operators.test(currentChar) || currentChar == ";" || currentChar == ")") {
 
     if (operators.test(lastChar) && currentChar == "-" && lastChar != "-")
       return true
