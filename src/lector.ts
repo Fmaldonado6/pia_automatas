@@ -189,6 +189,10 @@ function validateImprimir(linea: string) {
 
   const realVarName = varName.replace(/\s/g, "")
 
+  const regexPalabrasReservadas = new RegExp(/^(leer|imprimir|programa|terminar|iniciar)$/)
+  if (regexPalabrasReservadas.test(realVarName))
+    throw new Error("Palabra reservada como nombre de variable")
+
   if (!variables.has(realVarName))
     throw new Error(`La variable ${realVarName} no esta definida al momento de utilizarse`)
   return true
