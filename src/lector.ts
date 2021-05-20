@@ -231,24 +231,37 @@ function validateExpresionSyntax(linea: string) {
 }
 
 function validateExpresion(expresion: string) {
-
+  const regexIsNumber = new RegExp(/[0-9]/)
   const parenthresis = []
 
-  let lastCharacter = ""
+  let lastCharacter = null
 
   let variableName = ""
 
-  for (let x of expresion.split("")) {
+  const expresionSplit = expresion.split("")
+  let index = 0
+  for (let x of expresionSplit) {
+
+    index++
+    const next = index < expresionSplit.length ? expresionSplit[index] : expresionSplit[index - 1]
 
 
     switch (x) {
-      case " ": continue;
+      case " ":
+        if (lastCharacter
+          && !operators.test(lastCharacter) && lastCharacter != ")"
+          && next != " "
+          && !operators.test(next)
+          && next != ";")
+          throw new Error(`Caracter '${x}' inesperado`)
+
+        continue;
       case "0":
         if (lastCharacter == "/")
           throw new Error(`Division entre 0`)
         break;
       case "(":
-        if (!operators.test(lastCharacter) && variableName.length > 0)
+        if (!operators.test(lastCharacter!!) && variableName.length > 0)
           throw new Error(`Caracter '${x}' inesperado`)
         parenthresis.push(x);
         variableName = ""
@@ -256,14 +269,14 @@ function validateExpresion(expresion: string) {
       case ")":
         if (parenthresis.length == 0
           || lastCharacter == "("
-          || operators.test(lastCharacter))
+          || operators.test(lastCharacter!!))
           throw new Error(`Caracter '${x}' inesperado`)
         parenthresis.pop()
         variableName = ""
 
         break;
       default:
-        if (validateExpresionItem(variableName, x, lastCharacter))
+        if (validateExpresionItem(variableName, x, lastCharacter!!))
           variableName = ""
         else variableName += x
         break;
@@ -273,21 +286,22 @@ function validateExpresion(expresion: string) {
 
 
   if (parenthresis.length != 0)
-    throw new Error(`Error de sintaxis`)
+    throw new Error(`Parentésis sin cerrar`)
 
 }
 
 function validateExpresionItem(item: string, currentChar: string, lastChar: string): boolean {
 
+  if (lastChar == ")" && !operators.test(currentChar) && currentChar != ";")
+    throw new Error(`Caracter '${currentChar}' inesperado`)
 
   if (item.split("").length == 0) {
 
-    if (operators.test(currentChar) && currentChar != "-")
+    if (operators.test(currentChar) && currentChar != "-" && lastChar != ")")
       throw new Error(`Caracter '${currentChar}' inesperado`)
 
     item = currentChar
   }
-
 
   const isVariable = isVariableRegex.test(item)
 
