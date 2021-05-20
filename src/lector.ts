@@ -249,17 +249,17 @@ function validateExpresion(expresion: string) {
     switch (x) {
       case " ":
         if (lastCharacter
-          && !operators.test(lastCharacter) && lastCharacter != ")"
+          && !operators.test(lastCharacter)
+          && lastCharacter != ")"
+          && lastCharacter != "("
           && next != " "
+          && next != ")"
           && !operators.test(next)
           && next != ";")
           throw new Error(`Caracter '${x}' inesperado`)
 
         continue;
-      case "0":
-        if (lastCharacter == "/")
-          throw new Error(`Division entre 0`)
-        break;
+
       case "(":
         if (!operators.test(lastCharacter!!) && variableName.length > 0)
           throw new Error(`Caracter '${x}' inesperado`)
@@ -276,6 +276,12 @@ function validateExpresion(expresion: string) {
 
         break;
       default:
+
+        if (lastCharacter == "/" && x == "0")
+          throw new Error(`Division entre 0`)
+
+    
+
         if (validateExpresionItem(variableName, x, lastCharacter!!))
           variableName = ""
         else variableName += x
